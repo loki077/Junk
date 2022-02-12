@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "13dc0018-d8d8-4139-9a34-53d6520db1b8": {
+      "ProjectGuid": "13dc0018-d8d8-4139-9a34-53d6520db1b8",
+      "DisplayName": "Mavlink",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
