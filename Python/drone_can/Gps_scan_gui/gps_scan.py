@@ -6,6 +6,7 @@ from PyQt5.QtCore import QTimer, Qt, QDateTime
 from logging import getLogger
 import pandas as pd
 from pathlib import Path
+import re
 
 
 #can be excluded
@@ -88,6 +89,8 @@ class GPSScan(QDialog):
         super(GPSScan, self).__init__()
         self.setWindowTitle('GPS Scan')
         self.setAttribute(Qt.WA_DeleteOnClose)              # This is required to stop background timers!
+
+        self.data_key = {"last_fix_time_ms":0,"last_message_time_ms":0,"delta_time_ms":0,"delayed_count":0,"average_delta_ms":0, "lagged_sample_count":0}
 
         #create File
         self.col_names = ['Time Stamp',
@@ -304,6 +307,8 @@ class GPSScan(QDialog):
         self._subscriber_handle = self._node.add_handler(dronecan.uavcan.equipment.gnss.Auxiliary, self.fetch_data)
         self._subscriber_handle = self._node.add_handler(dronecan.uavcan.equipment.gnss.Fix2, self.fetch_data)
         self._subscriber_handle = self._node.add_handler(dronecan.ardupilot.gnss.Status, self.fetch_data)
+        self._subscriber_handle  = self._node.add_handler(dronecan.uavcan.protocol.debug.LogMessage, self.fetch_data)
+
         self.scan_group.setEnabled(True)
 
     def fetch_data(self,msg):
@@ -381,6 +386,20 @@ class GPSScan(QDialog):
                 self._arm_status_display.setText("True")
                 self._arm_status_display.setStyleSheet("background-color: green; border: 1px solid black;")
                 self.arm_status_var.feed_val(1)
+        
+        if "uavcan.protocol.debug.LogMessage" in str(payload):
+            text = dronecan.to_yaml(payload)
+            if "GPS_LOG" in text:
+                result = re.search('\'GPS_LOG,(.+?) \' #', text)
+                if result:
+                    data = result.group(1).split(",")
+                    i = 0
+                    for key in self.data_key:
+                        self.data_key[key] = data[i]
+                        i+=1
+                    print(self.data_key)
+
+
 
     def on_user_detail_changed(self):
         if self.user_name.text() != "" and self.user_email.text() != "" and self.gps_dev_id.text() != "" and self.cpn_dev_id.text() != "":
@@ -501,7 +520,7 @@ if __name__ == "__main__":
 
     try:
         # Initializing a DroneCAN node instance.
-        node = dronecan.make_node(args.port, node_id=11, bitrate=args.bitrate)
+        node = dronecan.make_node(args.port, node_id=26, bitrate=args.bitrate)
         # Initializing a node monitor
         node_monitor = dronecan.app.node_monitor.NodeMonitor(node)
         print("CAN Node Init Successful")
