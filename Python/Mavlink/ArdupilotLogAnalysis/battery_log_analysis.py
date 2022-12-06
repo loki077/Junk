@@ -18,6 +18,12 @@ import math, sys, multiprocessing, random, time, datetime, os, re
 import socket
 import logging
 from argparse import ArgumentParser
+
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QLabel, QDialog, QSlider, QSpinBox, QDoubleSpinBox, \
+    QPlainTextEdit, QCheckBox, QGridLayout, QGroupBox , QApplication, QPushButton, QLineEdit, QProgressBar, QMessageBox
+from PyQt5.QtCore import QTimer, Qt, QDateTime
+
+
 parser = ArgumentParser(description=__doc__)
 
 '''****************************Constant****************************'''
