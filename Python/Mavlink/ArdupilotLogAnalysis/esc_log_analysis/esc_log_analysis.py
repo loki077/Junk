@@ -24,46 +24,32 @@
 #                   https://realpython.com/python-pyqt-layout/
 ###-----------------------------------------------------------------
 
-from __future__ import annotations
+# from __future__ import annotations
 from typing import *
-import dronecan
-from functools import partial
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QLabel, QDialog, QSlider, QSpinBox, QDoubleSpinBox, \
-    QPlainTextEdit, QCheckBox, QGridLayout, QGroupBox , QApplication, QPushButton, QLineEdit, QProgressBar, QMessageBox, QFileDialog,QComboBox
+from PyQt5.QtWidgets import QLabel, QDialog, QSpinBox, QGridLayout, QGroupBox , QApplication, QPushButton, QLineEdit, QProgressBar, QFileDialog,QComboBox
 from PyQt5.QtCore import QTimer, Qt, QDateTime
-from PyQt5.QtChart import QChart, QChartView, QLineSeries
-from PyQt5.QtTextToSpeech import QTextToSpeech
+
 
 # importing pyqtgraph as pg
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
 
 from logging import getLogger
 import pandas as pd
-import numpy as np
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.qt_compat import QtCore, QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvas
-import matplotlib as mpl
 import matplotlib.figure as mpl_fig
 import matplotlib.animation as anim
 
 from pathlib import Path
-import re
 import fnmatch
-import csv
 
+import dronecan
 from pymavlink import mavutil
-from pymavlink import mavextra
 
 #can be excluded
 import sys, os
 import glob
-import platform
 from argparse import ArgumentParser
-import random
-
 
 __all__ = 'PANEL_NAME', 'spawn', 'get_icon'
 
@@ -169,18 +155,18 @@ class ESCLogAnalysis(QDialog):
             ]
 
         time = QDateTime.currentDateTime()
-        time_display = time.toString('yyyy-MM-dd hh:mm:ss dddd')
-        self.telem_log_file_name = "esc_log_analysis_master"+time_display+".csv"
-        
+        time_display = time.toString('yyyyMMdd hhmmss dddd')
+        self.telem_log_file_name =  self.resource_path("esc_log_analysis_master"+time_display+".csv")
+        print(self.telem_log_file_name)
         self.telem_log_file = pd.DataFrame([], columns=self.telem_col_names)
         self.telem_log_file.to_csv(self.telem_log_file_name)
         print("Telem Log File Created")
 
-        self.master_file_name = "esc_log_analysis_master.csv"
+        self.master_file_name = self.resource_path("esc_log_analysis_master.csv")
         self.master_file_path = Path(self.master_file_name)
 
         if self.master_file_path.exists():
-            self.master_file = pd.read_csv(self.master_file_path)
+            self.master_file = pd.read_csv(self.master_file_name)
             print("Master log File Open")
         else:
             self.master_file = pd.DataFrame([], columns=self.col_names)
@@ -415,12 +401,17 @@ class ESCLogAnalysis(QDialog):
                 else:
                     out[port.description()] = port.systemLocation()
 
-            mifaces = _mavcan_interfaces()
-            for x in mifaces:
-                out[x] = x
-
         return out
     
+    #
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        
+        return os.path.join(base_path,relative_path)
+
     #load log
     def load_log_prc(self):
         self.load_log.setEnabled(False)
