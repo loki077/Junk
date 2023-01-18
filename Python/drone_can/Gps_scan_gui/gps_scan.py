@@ -364,7 +364,7 @@ class GPSScan(QDialog):
             if not node_id in self.last_fix2:
                 self.last_fix2[node_id] = t_stamp
                 return
-            loop_delay = t_stamp - self.last_fix2[node_id]
+            loop_delay = (t_stamp - self.last_fix2[node_id])*1000
             self.last_fix2[node_id] = t_stamp
 
             self._loop_delay_display.setText(str("%.3f ms"% loop_delay))

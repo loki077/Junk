@@ -46,6 +46,7 @@ def process_log(fname):
             if count_imu1 == 0:
                 for a in axes:
                     lp1[a] = getattr(m,a)
+                    print(getattr(m,a))
             for a in axes:
                 lp1[a] = alpha * lp1[a] + (1.0-alpha) * getattr(m,a)
             count_imu1 += 1
@@ -54,6 +55,7 @@ def process_log(fname):
             if count_imu3 == 0:
                 for a in axes:
                     lp3[a] = getattr(m,a)
+                    print(getattr(m,a))
             for a in axes:
                 lp3[a] = alpha * lp3[a] + (1.0-alpha) * getattr(m,a)
             count_imu3 += 1
