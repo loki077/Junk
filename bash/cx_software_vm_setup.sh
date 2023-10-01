@@ -7,6 +7,9 @@ printf 'Welcome $(whoami). This script is to install default apps for CX-Softwar
 printf 'Included....\nnet-tools\nVScode\nGitkraken\nGithub\n'
 printf 'Begin installation.........'
 
+# Get the currently logged-in username using the `whoami` command
+username=$(whoami)
+
 cd ~
 sudo apt update
 sudo apt install -yy net-tools git && snap install code gitkraken
@@ -100,3 +103,89 @@ source ~/.bashrc
 
 
 sudo apt install mlocate
+
+# Add Google Chrome repository
+echo "Adding Google Chrome repository..."
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+
+# Update package list
+echo "Updating package list..."
+sudo apt update
+
+# Install Google Chrome
+echo "Installing Google Chrome..."
+sudo apt install google-chrome-stable
+
+echo "Google Chrome installation complete."
+
+#install ACT for local CI
+# Function to print step headers
+print_step() {
+  echo "--------------------------------------------------"
+  echo "Step $1: $2"
+  echo "--------------------------------------------------"
+}
+
+# Prerequisites
+
+print_step 1 "Install Docker on Ubuntu"
+
+# Step 1: Install Docker on Ubuntu
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu focal stable" | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo docker --version
+sudo usermod -aG docker $username
+
+print_step 2 "Install Brew in Ubuntu"
+
+# Step 2: Install Brew in Ubuntu
+sudo apt update
+sudo apt install build-essential curl file git
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+(echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ~/.profile
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+sudo apt-get install build-essential
+brew install gcc
+
+print_step 3 "Install act"
+
+# Step 3: Install act
+brew --version
+brew install act
+act --version
+
+echo "Congratulations! You have successfully set up and run GitHub Action CI locally on your Ubuntu machine using the act tool."
+
+
+# create Git alias
+# Alias for 'status'
+git config --global alias.st status
+
+# Alias for 'log' with a pretty format
+git config --global alias.lg "log --oneline --graph --decorate --all"
+
+# Alias for 'commit' with a helpful message
+git config --global alias.ci "commit -m"
+
+# Alias for 'branch' to list branches
+git config --global alias.br branch
+
+# Alias for 'diff' with color highlighting
+git config --global alias.dif "diff --color"
+
+git config --global alias.co checkout
+
+git config --global alias.cob "checkout -b"
+
+git config --global alias.su "submodule update --init --recursive"
+
+
+#install cmake
+sudo apt install cmake
