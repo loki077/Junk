@@ -1,6 +1,20 @@
 import os
 from pymavlink import mavutil
 import struct
+import sys
+
+# Check if the file path argument is provided
+if len(sys.argv) < 2:
+    print("Please provide a file path as an argument.")
+    sys.exit(1)
+
+# Get the file path from the command-line argument
+logs_folder_path = sys.argv[1]
+
+# Use the file_path variable as needed
+print("Scanning Folder path:", logs_folder_path)
+
+# logs_folder_path = 'D:\\Dropbox (Carbonix Company)\\Carbonix Engineering Team Folder\\Flight\\Flight Logs\\V36'
 
 # Define constants
 GPS_FIX_TYPE = 3  # GPS fix type value indicating a 3D fix
@@ -49,7 +63,6 @@ def extract_and_parse_logs(folder_path):
                 gps_statistics(log_path, gps_0_data, gps_1_data)
 
 # logs_folder_path = 'D:\\Logs\\V34'
-logs_folder_path = 'C:\\Users\\Lokesh\\Dropbox (Carbonix Company)\\Carbonix Engineering Team Folder\\Flight\\Flight Logs\\V37'
 extract_and_parse_logs(logs_folder_path)
 
 print("Script End")
