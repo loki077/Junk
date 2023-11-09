@@ -31,7 +31,7 @@ inline void SafeDeletePointer(T& pointer)
     }
 }
 
-// Comment: I would prefer to use a class object and not structure but going by the Question
+// Comment: I would prefer to use a class object and not structure but going by the
 struct Node {
     int value;
     Node* left;
@@ -69,9 +69,8 @@ Node* createTree() {
     root->left->right->left->right = newNode(10);
     return root;
 }
-
-//max depth function
-int maxDepth(const Node* node) 
+//max depth function 
+int maxDepth(Node* const& node) 
 {
     //returning if you passed a null
     if (node == nullptr) {        

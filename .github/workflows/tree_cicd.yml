@@ -1,0 +1,36 @@
+name: tree_depth_check 
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    concurrency: 
+      group: tree_depth_check
+      cancel-in-progress: true
+    strategy:
+      fail-fast: true
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: sudo apt-get install -y g++-11 valgrind
+    
+    - name: Compile
+      run: g++ -std=c++17 -g Cpp/Tree_Depth_Check/src/tree_depth_check.cpp -o Cpp/Tree_Depth_Check/output/tree_depth_check_valgrind
+
+    - name: Run Valgrind
+      run: valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./Cpp/Tree_Depth_Check/output/tree_depth_check_valgrind
+
+    - name: Build
+      run: g++ -std=c++17 -Wall -Wextra -Werror -Wshadow -Wold-style-cast Cpp/Tree_Depth_Check/src/tree_depth_check.cpp -o Cpp/Tree_Depth_Check/output/tree_depth_check
+      
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: output
+        path: Cpp/Tree_Depth_Check/output/
+        retention-days: 7
