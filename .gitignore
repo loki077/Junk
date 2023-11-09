@@ -1,7 +1,8 @@
 venv/
-/home/carbonix-software/Desktop/dev/Junk/Python/drone_can/Gps_scan_gui/gps_scan_master.csv
-/home/carbonix-software/Desktop/dev/Junk/Python/Mavlink/MissionPlannerUI/client.txt
-/home/carbonix-software/Desktop/dev/Junk/Python/Mavlink/MissionPlannerUI/server.txt
-/home/carbonix-software/Desktop/dev/Junk/Python/threading/tutorial/photo-1493976040374-85c8e12f0c0e.jpg
-/home/carbonix-software/Desktop/dev/Junk/Python/threading/tutorial/photo-1504198453319-5ce911bafcde.jpg
+/Python/drone_can/Gps_scan_gui/gps_scan_master.csv
+/Python/Mavlink/MissionPlannerUI/client.txt
+/Python/Mavlink/MissionPlannerUI/server.txt
+/Python/threading/tutorial/photo-1493976040374-85c8e12f0c0e.jpg
+/Python/threading/tutorial/photo-1504198453319-5ce911bafcde.jpg
+.vscode/
 *.exe
