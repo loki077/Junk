@@ -5,8 +5,11 @@ import os
 from matplotlib.widgets import CheckButtons
 import numpy as np
 from pymavlink import mavutil
+# Set the MAVLink dialect to ardupilotmega
+os.environ['MAVLINK20'] = '1'
+os.environ['MAVLINK_DIALECT'] = 'ardupilotmega'
 
-def convert_tlog_to_csv(file:str , output_file_name:str='output.csv') -> None:
+def convert_tlog_to_csv(file:str , output_file_name:str='output.csv') -> pd.DataFrame:
     # Open the TLOG files
     mlog = mavutil.mavlink_connection(file)
     print('Opened TLOG file: ' + file)
@@ -17,12 +20,19 @@ def convert_tlog_to_csv(file:str , output_file_name:str='output.csv') -> None:
         if msg is None:
             break
         if msg is not None:
-            messages.append(msg.to_dict())
+            if msg._header.srcSystem != 255 and msg._header.srcComponent != 190:
+                messages.append([msg._timestamp *1000, msg._header.seq, msg._header.msgId])
     # Convert the list to a DataFrame
     df = pd.DataFrame(messages)
+
+    df.columns = ['timestamp', 'sequence', 'msg_type']
+    df['sequence'] = convert_loop_sequence(df['sequence'])
+    df['sequence_diff'] = df['sequence'].diff().fillna(0)
+    df['timestamp_diff'] = df['timestamp'].diff().fillna(0)
     #save file
     df.to_csv(output_file_name, index=False)
     print('Saved CSV file: ' + output_file_name)
+    return df
 
 def convert_loop_sequence(series: pd.Series )-> pd.Series:
     offset = 0
@@ -134,8 +144,8 @@ def check_file_extension(file_path):
 
 def main() -> None:
     if check_file_extension(args.path_4g) == 'tlog':
-        convert_tlog_to_csv(args.path_4g, "4g_tlog.csv")
-        convert_tlog_to_csv(args.path_4g, "rf_tlog.csv")
+        df_4g = convert_tlog_to_csv(args.path_4g, "4g_tlog.csv")
+        df_rf = convert_tlog_to_csv(args.path_rf, "rf_tlog.csv")
         path_4g = "4g_tlog.csv"
         path_rf = "rf_tlog.csv"
     elif check_file_extension(args.path_4g) == None:
@@ -145,11 +155,11 @@ def main() -> None:
             return
         path_4g = "4g.csv"
         path_rf = "rf.csv"
+        df_4g = process_file(path_4g)
+        df_rf = process_file(path_rf)
     else:
         print('File extension not supported')
         return
-    df_4g = process_file(path_4g)
-    df_rf = process_file(path_rf)
     plot_main_graph(df_4g, df_rf)
     plot_hist_graph(df_4g, "4G") 
     plot_hist_graph(df_rf, "RF") 
