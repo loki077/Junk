@@ -6,3 +6,5 @@ venv/
 /Python/threading/tutorial/photo-1504198453319-5ce911bafcde.jpg
 .vscode/
 *.exe
+/Python/dropbox/compiled-output/
+/Python/tlog_mavlink_sequencer/data/
