@@ -1,0 +1,48 @@
+#!/bin/bash
+# A script suitable for use as a git commit-msg hook to ensure your commits
+# reference the JIRA ticket they are working on.
+# 
+# Use this by copying it to a file called $ARDUPILOT_ROOT/.git/hooks/commit-msg
+
+# Regular expression for the branch naming convention
+
+JIRA_ID_REGEX="[a-zA-Z0-9]{2,4}-[0-9]+"
+BRANCH_NAME_REGEX="^feature/${JIRA_ID_REGEX}(-.*)?$"
+
+CURRENT_BRANCH=$(git branch --show-current)
+
+# Exit if there is no current branch
+if [[ -z $CURRENT_BRANCH ]]; then
+    echo "ERROR: No current branch."
+    exit 0
+fi
+
+if [[ ! $CURRENT_BRANCH =~ $BRANCH_NAME_REGEX ]]; then
+    echo "ERROR: CURRENT_BRANCH '$CURRENT_BRANCH' and BRANCH_NAME_REGEX '$BRANCH_NAME_REGEX' does not follow the naming convention (e.g., feature/ABC-123-optional)."
+    exit 1
+fi
+
+if [[ $CURRENT_BRANCH =~ $JIRA_ID_REGEX ]]; then
+    JIRA_ID=${BASH_REMATCH[0]}
+else
+    echo "ERROR: Unable to extract Jira issue ID from branch name."
+    exit 1
+fi
+
+# Commit message file
+COMMIT_MSG_FILE=$1
+
+# If the commit message is blank, don't do anything
+# Let the git complain about the empty commit message
+if ! grep -v '^#' $COMMIT_MSG_FILE | grep -q '[^[:space:]]'; then
+    exit 0
+fi
+
+echo "checking commit message for Jira ID: $JIRA_ID"
+# Check if the commit message already contains the Jira ID
+if ! grep -v '^#' $COMMIT_MSG_FILE | grep -q "$JIRA_ID"; then
+    # Append the Jira ID to the commit message
+    echo -e "\n$JIRA_ID" >> "$COMMIT_MSG_FILE"
+fi
+
+exit 0
