@@ -8,3 +8,4 @@ venv/
 *.exe
 /Python/dropbox/compiled-output/
 /Python/tlog_mavlink_sequencer/data/
+.env
